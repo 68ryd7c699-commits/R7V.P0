@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+<title>اهرب من أبو شنب!</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:repeating-linear-gradient(45deg,rgba(255,255,255,.05) 0 10px,transparent 10px 20px),radial-gradient(circle at 50% 0,#3d8bff 0,#1243a8 45%,#0a2461 100%) fixed;color:#fff;font-family:Verdana,Tahoma,Arial,sans-serif;display:flex;flex-direction:column;align-items:center;min-height:100vh;padding:10px;user-select:none;-webkit-user-select:none}
+.rb{background:linear-gradient(#ffd54a,#ff9800);color:#6b2e00;font:700 12px Verdana;padding:3px 18px;border-radius:12px;border:1px solid #b34a00;box-shadow:inset 0 1px 0 rgba(255,255,255,.8);margin:2px 0}
+h1{font-family:'Arial Black',Impact,sans-serif;color:#fff;font-size:28px;margin:6px 0 10px;text-shadow:0 2px 0 #ff7a00,0 4px 0 #b34a00,0 7px 8px rgba(0,0,0,.55)}
+#w{position:relative;width:100%;max-width:800px;border:4px solid #fff;border-radius:6px;box-shadow:0 0 0 3px #000,0 12px 26px rgba(0,0,0,.65);overflow:hidden;background:#000}
+canvas{width:100%;display:block;background:#87ceeb;touch-action:manipulation;image-rendering:pixelated}
+#ov{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(8,24,70,.85);text-align:center;padding:12px}
+#ov .card{max-width:430px;background:linear-gradient(#3a7fe6,#143c86);border:3px solid #fff;border-radius:12px;padding:16px;box-shadow:0 0 0 2px #000,0 8px 18px rgba(0,0,0,.6)}
+#ov h2{color:#ffe14d;font-family:'Arial Black',Impact,sans-serif;font-size:28px;margin-bottom:8px;text-shadow:2px 2px 0 #000}
+#ov p{margin:6px 0 12px;line-height:1.7;font-size:14px}
+button,label.b{cursor:pointer;border:2px solid #a34100;border-radius:10px;background:linear-gradient(#ffc247 0%,#ff9100 50%,#ff7a00 51%,#ffa726 100%);color:#fff;text-shadow:0 1px 2px #6b2e00;font:700 16px Verdana;padding:9px 22px;margin:4px;display:inline-block;box-shadow:inset 0 1px 0 rgba(255,255,255,.7),0 3px 0 #a34100}
+button.g,label.b{background:linear-gradient(#6fb1ff 0%,#2f7be0 50%,#1f63c4 51%,#4b97ee 100%);border-color:#0d3b8c;text-shadow:0 1px 2px #082a66;font-size:12px;padding:7px 14px;box-shadow:inset 0 1px 0 rgba(255,255,255,.6),0 3px 0 #0d3b8c}
+button:hover,label.b:hover{filter:brightness(1.12)}button:active{transform:translateY(2px)}
+.hide{display:none!important}
+.bar{margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+#pre{position:absolute;inset:0;z-index:5;background:#000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;font:700 18px Verdana}
+.lb{width:60%;height:24px;border:2px solid #fff;border-radius:4px;padding:2px}
+.lb i{display:block;height:100%;width:0;background:repeating-linear-gradient(-45deg,#39b54a 0 10px,#2e9a3d 10px 20px)}
+footer{margin-top:14px;font-size:13px;color:#cfe0ff;text-align:center;line-height:2;text-shadow:0 1px 2px #000}
+footer a{color:#ffe14d;margin:0 8px;text-decoration:none;font-weight:700}
+</style>
+</head>
+<body>
+<div class="rb">&#9733; ألعاب فلاش 2009 &#9733;</div>
+<h1>اهرب من أبو شنب! 🥸💨</h1>
+<div id="w">
+  <div id="pre"><div>جاري التحميل... <span id="pc">0%</span></div><div class="lb"><i id="pf"></i></div></div>
+  <canvas id="c" width="400" height="200"></canvas>
+  <div id="ov">
+    <div class="card">
+      <h2 id="ot">اهرب من أبو شنب!</h2>
+      <p id="op">أبو شنب مجنون ويلحقك! اقفز فوق العوائق، وكل مرحلة تعدّيها تعطيك نقطة، وكل مرحلة هو يصير أسرع.<br>مسافة / سهم فوق / لمس الشاشة = قفز (وتقدر تقفز مرتين!)</p>
+      <button id="go">ابدأ الهروب</button>
+    </div>
+  </div>
+</div>
+<div class="bar">
+  <label class="b">صورة مخصصة للمطارد (من جهازك)<input type="file" id="img" accept="image/*" hidden></label>
+  <button class="g" id="def">الرجوع للشكل الكرتوني</button>
+  <button class="g" id="mute">الصوت: شغال</button>
+</div>
+<footer>
+  جميع الحقوق محفوظة<br>
+  <a href="https://www.tiktok.com/@r7v.p0" target="_blank" rel="noopener">TikTok: r7v.p0</a>
+  <a href="https://www.instagram.com/r7v.p0saddam" target="_blank" rel="noopener">Instagram: r7v.p0saddam</a>
+</footer>
+
+<script>
+const $=s=>document.querySelector(s),cv=$('#c'),x=cv.getContext('2d');
+const W=800,H=400,GY=330,PX=330;
+const rnd=(a,b)=>a+Math.random()*(b-a),pick=a=>a[Math.floor(Math.random()*a.length)];
+const HIT=['آخ! زلقت 🍌','شفت نجوم ⭐','تعثرت بكرامتك 😂','بووم! اصطدام بقوة 9 ريختر','عيونك في جيبك؟ 👀'];
+const UP=['سرعة صاروخ 🚀','المطارد بدأ يتعرق 💦','حتى الجرذ ما لحقك 🐀','أسرع من الواي فاي 📶','ركضك يحتاج رخصة! 🏎️','أبو شنب يلهث 🥵'];
+const SAY=['وقّف يا ولد!','رجّع الكرسي!','أنا جوعان 🍔','تعال نسولف شوي!','شنبي بيوصل قبلك!','ارحمني، تعبت!','ليش تركض؟!'];
+const OVER=['مسكك أبو شنب وعمل لك محاضرة ٣ ساعات 😂','طيّرك بالشنب 🥸','انتهى الركض.. وبدأ العزاء 😂','أبو شنب فاز وأخذ حذاءك 👟','سقطت! بس على الأقل ركضت حلو'];
+const OBS=['🍌','🐈','🍕','🪑','🧱','🛒','🐓','📦'];
+
+let st='menu',best=+localStorage.getItem('esc_best')||0,muted=false,chImg=null,ac=null;
+let p,g,obs,score,stage,dist,spawn,msg,msgT,shake,speech,speechT,sc=0,tm=0;
+
+function beep(f,d=.12,ty='square',v=.05){
+  if(muted)return;
+  try{ac=ac||new(window.AudioContext||window.webkitAudioContext)();
+    const o=ac.createOscillator(),n=ac.createGain();o.type=ty;o.frequency.value=f;n.gain.value=v;
+    o.connect(n);n.connect(ac.destination);o.start();
+    o.frequency.exponentialRampToValueAtTime(f*1.8,ac.currentTime+d);
+    n.gain.exponentialRampToValueAtTime(.001,ac.currentTime+d);o.stop(ac.currentTime+d);}catch(e){}
+}
+function reset(){p={y:GY,vy:0,j:0};g=220;obs=[];score=0;stage=1;dist=0;spawn=1;msg='';msgT=0;shake=0;speech='';speechT=0;}
+reset();
+
+function jump(){if(st!=='play')return;if(p.j<2){p.vy=-640;p.j++;beep(480,.12)}}
+addEventListener('keydown',e=>{if(['Space','ArrowUp','KeyW'].includes(e.code)){e.preventDefault();jump()}});
+cv.addEventListener('pointerdown',jump);
+
+function show(t,pr,btn){$('#ot').textContent=t;$('#op').innerHTML=pr;$('#go').textContent=btn;$('#ov').classList.remove('hide')}
+$('#go').onclick=()=>{reset();st='play';$('#ov').classList.add('hide');beep(600,.15)};
+$('#mute').onclick=()=>{muted=!muted;$('#mute').textContent='الصوت: '+(muted?'مقفل':'شغال')};
+$('#img').onchange=e=>{const f=e.target.files[0];if(!f)return;const i=new Image();i.onload=()=>chImg=i;i.src=URL.createObjectURL(f)};
+$('#def').onclick=()=>chImg=null;
+
+function over(){
+  st='over';beep(110,.5,'sawtooth',.08);
+  if(score>best){best=score;localStorage.setItem('esc_best',best)}
+  show('انمسكت! 😵',pick(OVER)+'<br><b>نقاطك: '+score+' | الأفضل: '+best+'</b>','حاول مرة ثانية');
+}
+
+function update(dt){
+  const v=300+stage*28;
+  p.vy+=1800*dt;p.y+=p.vy*dt;if(p.y>=GY){p.y=GY;p.vy=0;p.j=0}
+  sc+=v*dt;dist+=v*dt;
+  g=Math.min(260,g+(14-stage*1.4)*dt);
+  spawn-=dt;
+  if(spawn<=0){spawn=rnd(380,700)/v;obs.push({x:W+40,e:pick(OBS),s:rnd(36,54)})}
+  for(const o of obs)o.x-=v*dt;
+  for(let i=obs.length-1;i>=0;i--){
+    const o=obs[i];
+    if(o.x<-60){obs.splice(i,1);continue}
+    const hw=o.s*.35;
+    if(PX+14>o.x-hw&&PX-14<o.x+hw&&p.y>GY-o.s*.75){
+      obs.splice(i,1);g-=75;shake=.3;msg=pick(HIT);msgT=1.2;beep(120,.25,'sawtooth',.07);
+    }
+  }
+  if(dist>=1800){dist=0;stage++;score++;g=Math.min(260,g+25);msg='المرحلة '+stage+'! '+pick(UP);msgT=2;beep(700,.25,'triangle',.07)}
+  speechT-=dt;if(speechT<-2.5){speech=pick(SAY);speechT=2}
+  msgT-=dt;shake=Math.max(0,shake-dt);
+  if(g<=40)over();
+}
+
+function boss(cx,cy){
+  const b=Math.abs(Math.sin(tm*11))*-7,hy=cy-85+b,sw=Math.sin(tm*11)*14;
+  x.lineCap='round';x.strokeStyle='#222';x.lineWidth=9;
+  x.beginPath();x.moveTo(cx-8,cy-30);x.lineTo(cx-8+sw,cy);x.moveTo(cx+8,cy-30);x.lineTo(cx+8-sw,cy);x.stroke();
+  x.fillStyle='#3b5b2e';x.beginPath();x.roundRect(cx-24,cy-72+b,48,46,10);x.fill();x.strokeStyle='#000';x.lineWidth=4;x.stroke();
+  x.fillStyle='#ffd23f';x.beginPath();x.arc(cx+8,cy-55+b,5,0,7);x.fill();
+  x.strokeStyle='#f1c27d';x.lineWidth=8;x.beginPath();x.moveTo(cx+22,cy-62+b);x.lineTo(cx+44,cy-80+b+sw/2);x.stroke();
+  if(chImg){
+    x.save();x.beginPath();x.arc(cx,hy,36,0,7);x.clip();
+    const r=Math.max(72/chImg.width,72/chImg.height);
+    x.drawImage(chImg,cx-chImg.width*r/2,hy-chImg.height*r/2,chImg.width*r,chImg.height*r);x.restore();
+    x.strokeStyle='#ffd23f';x.lineWidth=4;x.beginPath();x.arc(cx,hy,36,0,7);x.stroke();
+  }else{
+    x.fillStyle='#f1c27d';x.beginPath();x.arc(cx,hy,36,0,7);x.fill();x.strokeStyle='#000';x.lineWidth=4;x.stroke();
+    x.fillStyle='#2f4a24';x.beginPath();x.ellipse(cx-4,hy-30,34,15,-.15,0,7);x.fill();
+    x.beginPath();x.arc(cx+14,hy-42,5,0,7);x.fill();
+    x.fillStyle='#fff';x.beginPath();x.arc(cx-12,hy-6,9,0,7);x.arc(cx+12,hy-6,9,0,7);x.fill();
+    x.fillStyle='#000';x.beginPath();x.arc(cx-9,hy-5,4,0,7);x.arc(cx+15,hy-5,4,0,7);x.fill();
+    x.strokeStyle='#000';x.lineWidth=4;x.beginPath();x.moveTo(cx-22,hy-20);x.lineTo(cx-4,hy-13);x.moveTo(cx+22,hy-20);x.lineTo(cx+4,hy-13);x.stroke();
+    x.fillStyle='#111';x.beginPath();x.moveTo(cx,hy+6);x.quadraticCurveTo(cx-30,hy+2,cx-34,hy+16);x.quadraticCurveTo(cx-14,hy+12,cx,hy+14);
+    x.quadraticCurveTo(cx+14,hy+12,cx+34,hy+16);x.quadraticCurveTo(cx+30,hy+2,cx,hy+6);x.fill();
+    x.fillStyle='#b3261e';x.beginPath();x.ellipse(cx,hy+24,10,Math.abs(Math.sin(tm*8))*5+3,0,0,7);x.fill();
+  }
+  if(speechT>0&&st==='play'){
+    const bx=Math.min(Math.max(cx+10,110),690);
+    x.font='bold 15px Tahoma';x.textAlign='center';
+    const w=x.measureText(speech).width+22;
+    x.fillStyle='#fff';x.beginPath();x.roundRect(bx-w/2,hy-82,w,28,10);x.fill();
+    x.fillStyle='#111';x.fillText(speech,bx,hy-62);
+  }
+}
+
+function draw(){
+  x.save();x.scale(.5,.5);
+  if(shake>0)x.translate(rnd(-5,5),rnd(-5,5));
+  const gr=x.createLinearGradient(0,0,0,GY);gr.addColorStop(0,'#5ec2ff');gr.addColorStop(1,'#d6f1ff');
+  x.fillStyle=gr;x.fillRect(0,0,W,H);
+  x.font='48px serif';x.textAlign='center';
+  for(let i=0;i<5;i++)x.fillText('☁️',((i*230-sc*.15)%1000+1000)%1000-100,70+(i%3)*32);
+  x.fillStyle='#8aa0c8';
+  for(let i=0;i<8;i++){const bx=((i*140-sc*.4)%1120+1120)%1120-120,bh=70+(i*37)%70;x.fillRect(bx,GY-bh,90,bh)}
+  x.fillStyle='#6b4a2b';x.fillRect(0,GY,W,H-GY);
+  x.fillStyle='#5a3d22';
+  for(let k=0;k<12;k++)x.fillRect(((k*80-sc)%960+960)%960-80,GY+14,40,6);
+  x.fillStyle='#3aa655';x.fillRect(0,GY,W,8);
+  x.textAlign='center';
+  for(const o of obs){x.font=o.s+'px serif';x.fillText(o.e,o.x,GY+4)}
+  boss(PX-g,GY);
+  x.save();x.translate(PX,p.y+(st==='play'&&p.y>=GY?Math.sin(tm*14)*-3:0));x.scale(-1,1);
+  x.font='52px serif';x.fillText('🏃',0,4);x.restore();
+  x.fillStyle='rgba(0,0,0,.45)';x.fillRect(0,0,W,34);
+  x.fillStyle='#ffd23f';x.font='bold 18px Tahoma';x.textAlign='center';
+  x.strokeStyle='#000';x.lineWidth=4;x.strokeText('⭐ النقاط: '+score+'   |   المرحلة: '+stage+'   |   الأفضل: '+best,W/2,23);x.fillText('⭐ النقاط: '+score+'   |   المرحلة: '+stage+'   |   الأفضل: '+best,W/2,23);
+  const dg=Math.max(0,Math.min(1,(g-40)/220));
+  x.fillStyle='#222';x.fillRect(W/2-100,40,200,10);x.fillStyle=dg>.35?'#4caf50':'#e53935';x.fillRect(W/2-100,40,200*dg,10);
+  x.fillStyle='#fff';x.font='11px Tahoma';x.fillText('المسافة بينك وبين أبو شنب',W/2,62);
+  if(msgT>0){x.globalAlpha=Math.min(1,msgT);x.font='bold 30px Tahoma';x.fillStyle='#fff';x.strokeStyle='#000';x.lineWidth=5;
+    x.strokeText(msg,W/2,150);x.fillText(msg,W/2,150);x.globalAlpha=1}
+  x.restore();
+}
+
+let last=performance.now();
+function loop(n){
+  const dt=Math.min(.05,(n-last)/1000);last=n;tm+=dt;
+  if(st==='play')update(dt);else sc+=60*dt;
+  draw();requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+(function(){let n=0;const t=setInterval(()=>{n+=Math.random()*9+3;if(n>=100){n=100;clearInterval(t);setTimeout(()=>$('#pre').remove(),250)}
+$('#pc').textContent=Math.floor(n)+'%';$('#pf').style.width=n+'%'},120)})();
+</script>
+</body>
+</html>
